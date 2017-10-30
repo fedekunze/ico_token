@@ -1,0 +1,5 @@
+Not sure what it means for the only allow person to purchase tokens if there is nobody behind them.
+
+Ability to get time remaining in crowdsale is missing
+
+Have not tested the time thing

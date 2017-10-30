@@ -6,7 +6,6 @@ import './utils/SafeMath.sol' ;
  * Allows buyers to line up on a first-in-first-out basis
  * See this example: http://interactivepython.org/courselib/static/pythonds/BasicDS/ImplementingaQueueinPython.html
  */
-
 contract Queue {
 	/* State variables */
 	uint8 size = 5;
