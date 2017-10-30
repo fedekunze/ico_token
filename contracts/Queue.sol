@@ -36,33 +36,33 @@ contract Queue {
 
 	/* Add constructor */
 	// YOUR CODE HERE
-	function Queue() {
+	function Queue() public {
 		// Set the size of the queue
 		owner = msg.sender;
 		queue.length = size;
 	}
 
 	/* Returns the number of people waiting in line */
-	function qsize() constant returns(uint8) {
+	function qsize() public constant returns(uint8) {
 		// YOUR CODE HERE
 		return uint8(queue.length);
 	}
 
 	/* Returns whether the queue is empty or not */
-	function empty() constant returns(bool) {
+	function empty() public constant returns(bool) {
 		// YOUR CODE HERE
 		if (queue.length == 0) return true;
 		else return false;
 	}
 
 	/* Returns the address of the person in the front of the queue */
-	function getFirst() constant returns(address) {
+	function getFirst() public constant returns(address) {
 		// YOUR CODE HERE
 		return queue[0];
 	}
 
 	/* Allows `msg.sender` to check their position in the queue */
-	function checkPlace() constant returns(uint8) {
+	function checkPlace() public constant returns(uint8) {
 		// YOUR CODE HERE
 		return positions[msg.sender];
 	}
@@ -70,7 +70,7 @@ contract Queue {
 	/* Allows anyone to expel the first person in line if their time
 	 * limit is up
 	 */
-	function checkTime() {
+	function checkTime() public {
 		// YOUR CODE HERE
 		if ((startTime.add(timeLimit)) >= now) {
 			dequeue();
@@ -81,7 +81,7 @@ contract Queue {
 	/* Removes the first person in line; either when their time is up or when
 	 * they are done with their purchase
 	 */
-	function dequeue() {
+	function dequeue() private {
 		// YOUR CODE HERE
 		/*
 			- Get the first person in line
@@ -107,7 +107,7 @@ contract Queue {
 	}
 
 	/* Places `addr` in the first empty position in the queue */
-	function enqueue(address addr) {
+	function enqueue(address addr) public {
 		// YOUR CODE HERE
 		/*
 			- Register address in the mapping

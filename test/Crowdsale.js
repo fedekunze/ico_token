@@ -2,8 +2,9 @@ const expectThrow = require('./helpers/expectThrow.js');
 
 var Token = artifacts.require('./Token.sol');
 var Crowdsale = artifacts.require('./Crowdsale.sol');
-const web3 = require('web3');
-var web3 = new Web3(new Web3.providers.HtppProvider("http://localhost:8545"));
+// const Web3 = require('web3');
+// var web3 = new Web3(new Web3.providers.HtppProvider("http://localhost:8545"));
+
 contract("Crowdsale", function(accounts) {
 	it("keeps track of how many tokens have been sold", async function() {
 		let crowdsale = await Crowdsale.new();
@@ -30,4 +31,4 @@ contract("Crowdsale", function(accounts) {
 		await token.addTokens(10);
 		assert.equal(await token.totalTokens.call(), 15, "Tokens were not added correctly");
 	})
-}
+})
