@@ -1,5 +1,5 @@
 pragma solidity ^0.4.15;
-
+import './utils/SafeMath.sol' ;
 /**
  * @title Queue
  * @dev Data structure contract used in `Crowdsale.sol`
@@ -13,9 +13,14 @@ contract Queue {
 	uint timeLimit = 30 minutes;
 	uint private startTime;
 
+	using SafeMath for uint;
+	using SafeMath for uint256;
+
+	address owner;
+
 	// YOUR CODE HERE
 	mapping (address => uint8) positions;
-	address[] public line;
+	address[] public queue;
 
 	/* Add events */
 	// YOUR CODE HERE
@@ -24,30 +29,37 @@ contract Queue {
 	event Enqueue(address _addr);
 	event Dequeue();
 
+	/* Modifiers */
+	modifier isOwner() {
+   	require(msg.sender == owner);
+ 		_;
+   }
+
 	/* Add constructor */
 	// YOUR CODE HERE
 	function Queue() {
 		// Set the size of the queue
-		line.length = size;
+		owner = msg.sender;
+		queue.length = size;
 	}
 
 	/* Returns the number of people waiting in line */
 	function qsize() constant returns(uint8) {
 		// YOUR CODE HERE
-		return uint8(line.length);
+		return uint8(queue.length);
 	}
 
 	/* Returns whether the queue is empty or not */
 	function empty() constant returns(bool) {
 		// YOUR CODE HERE
-		if (line.length == 0) return true;
+		if (queue.length == 0) return true;
 		else return false;
 	}
 
 	/* Returns the address of the person in the front of the queue */
 	function getFirst() constant returns(address) {
 		// YOUR CODE HERE
-		return line[0];
+		return queue[0];
 	}
 
 	/* Allows `msg.sender` to check their position in the queue */
@@ -61,7 +73,7 @@ contract Queue {
 	 */
 	function checkTime() {
 		// YOUR CODE HERE
-		if ((startTime + timeLimit) >= now) {
+		if ((startTime.add(timeLimit)) >= now) {
 			dequeue();
 			Timeout();
 		}
@@ -80,14 +92,14 @@ contract Queue {
 			- Trigger event Dequeue
 		*/
 		address firstInLine = getFirst();
-		address[] memory arrayNew = new address[](line.length-1);
+		address[] memory arrayNew = new address[](queue.length-1);
     for (uint i = 0; i<arrayNew.length; i++){
-			address addr = line[i+1];
+			address addr = queue[i+1];
       arrayNew[i] = addr;
 			positions[addr] -= 1;
     }
-		line.length -= 1;
-    line = arrayNew;
+		queue.length -= 1;
+    queue = arrayNew;
 		delete positions[firstInLine];
 		Dequeue();
 		firstInLine = getFirst();
@@ -103,9 +115,9 @@ contract Queue {
 			- Extend list one position
 			- Append address to list
 		*/
-		positions[addr] = uint8(line.length);
-		line.length = line.length + 1;
-		line.push(addr);
+		positions[addr] = uint8(queue.length);
+		queue.length += 1;
+		queue.push(addr);
 		Enqueue(addr);
 	}
 }

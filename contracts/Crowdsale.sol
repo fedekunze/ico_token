@@ -50,21 +50,77 @@ contract Crowdsale {
      _;
    }
 
-  function Cowdsale(uint _totalTokens, uint _queueTimeout, uint saleDuration, uint conversionRate) {
+  function Cowdsale(uint _totalTokens, uint saleDuration, uint conversionRate) {
     tokenSold = 0;
     weiRaised = 0;
     owner = msg.sender;
     token = new Token(_totalTokens);
-    queue = new Queue(_queueTimeout);
+    queue = new Queue();
 
     tokenSaleStart = now;
     tokenSaleEnds = tokenSaleStart + saleDuration;
+
+    weiToToken = conversionRate;
   }
 
   function () {
     revert();
   }
 
+  function buy()
+    tokenSaleActive()
+    payable
+    public
+    returns(bool)
+   {
+     if (queue.getFirst() == msg.sender) {
+       queue.dequeue();
 
+       uint tokensGranted = msg.value.div(weiToToken);
+       uint refund = msg.value.sub(tokensGranted.mul(weiToToken));
+       balances[msg.sender] = refund;
+
+       token.transfer(msg.sender, tokensGranted);
+       tokenSold += tokensGranted;
+			 return true;
+     }
+     return false;
+   }
+
+   function withdrawRefund()
+    tokenSaleActive()
+    external
+    returns(bool)
+   {
+    if (balances[msg.sender] > 0) {
+ 		uint transferAmount = balances[msg.sender];
+ 	  balances[msg.sender] = 0;
+ 	  msg.sender.transfer(transferAmount);
+ 		return true;
+    } else {
+      return false;
+    }
+ 	}
+
+  function refund()
+    tokenSaleActive()
+    public
+  {
+    uint tokensBalance = token.balanceOf(msg.sender);
+    token.approveRefund(msg.sender, tokensBalance);
+    token.transferFrom(msg.sender, address(this), tokensBalance);
+
+    uint refundedAmount = tokensBalance.mul(weiToToken);
+    balances[msg.sender] = refundedAmount;
+    tokenSold -= tokensBalance;
+  }
+
+  function mint(uint256 _amount) isOwner() public {
+    token.addTokens(_amount);
+  }
+
+  function burn(uint256 _amount) isOwner() public {
+    token.burnTokens(_amount);
+  }
 
 }
